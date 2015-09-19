@@ -1,6 +1,22 @@
 import sys
 import random
 
+def drawTable(table):
+    print "+",
+    print "-"*(len(table[0])*2),
+    print "+"
+    for row in table:
+        print "|",
+        for column in row:
+            if column:
+                print "0",
+            else:
+                print " ",
+        print "|"
+    print "+",
+    print "-"*(len(table[0])*2),
+    print "+"
+
 def makeMove(x, y, table):
     y_len = len(table)
     x_len = len(table[0])
@@ -105,14 +121,26 @@ def main():
             % (x, y, number_of_steps)
 
     # infinite loop, end program with CTRL+C
-    while True:
-        # find first solution with less steps then given
-        solution = solve(x, y, number_of_steps)
-        # update number of steps
-        number_of_steps = len(solution)
-        # print solution
-        print "\nNumber of steps: %d" % number_of_steps
-        print "Steps: %r" % solution
+    try:
+        while True:
+            # find first solution with less steps then given
+            solution = solve(x, y, number_of_steps)
+            # update number of steps
+            number_of_steps = len(solution)
+            # print solution
+            print "\nNumber of steps: %d" % number_of_steps
+            print "Steps: %r" % solution
+    except:
+        # if we have result draw it step by step
+        if solution:
+            table = createTable(x, y)
+            drawTable(table)
+            for step in solution:
+                makeMove(step[0], step[1], table)
+                print "move: %r" % (step,)
+                drawTable(table)
+                raw_input("Press for next...")
+                print ""
 
 if __name__ == "__main__":
     main()
