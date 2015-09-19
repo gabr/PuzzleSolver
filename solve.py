@@ -37,10 +37,37 @@ def checkTable(table):
                 return False
     return True
 
-def createTable(x, y):
-    return [[False for column in xrange(x)] for row in xrange(y)]
+def copyTable(table):
+    return [[column for column in row] for row in table]
 
-def solve(x, y, max_number_of_steps):
+def createTable(x, y):
+    return [[False for column in range(x)] for row in range(y)]
+
+def solveBreadth(x, y):
+    if x >= 5 or y >= 5:
+        print "DONT!!!!"
+        return []
+    # create empty table
+    tables = [createTable(x, y) for _ in range(x*y)]
+    steps = [[] for _ in range(x*y)]
+    while True:
+        next_tables = []
+        next_steps = []
+        for table in range(len(tables)):
+            for row in range(len(tables[table])):
+                for column in range(len(tables[table][0])):
+                    copy_table = copyTable(tables[table])
+                    copy_steps = steps[table][:]
+                    copy_steps.append((row, column))
+                    makeMove(row, column, copy_table)
+                    if checkTable(copy_table):
+                        return copy_steps
+                    next_tables.append(copy_table)
+                    next_steps.append(copy_steps)
+        tables = next_tables
+        steps = next_steps
+
+def solveGenetic(x, y, max_number_of_steps):
     """
         Genetic algorithm.
         Solves problem trying random moves until whole
@@ -86,51 +113,67 @@ def main():
     number_of_steps = 100000
 
     # check number of given arguments
-    if len(sys.argv) != 3 and len(sys.argv) != 4:
+    if (len(sys.argv) != 4 and len(sys.argv) != 5) \
+            or (sys.argv[1] != "b" and sys.argv[1] != "g"):
         print ""
         print "ussage:"
-        print " %s <number of columns> <number of rows>" % sys.argv[0],
+        print " %s b|g <number of columns> <number of rows>" % sys.argv[0],
         print "[<init number of steps>]"
         print ""
-        print " Default value for initial number of steps is %d" \
+        print " b - use breadth-first search"
+        print " g - use genetic algorithm"
+        print "     Default value for initial number of steps is %d" \
                 % number_of_steps
-        print ""
-        print ""
+        print "     Used only in genetic algorithm!"
         print " Coordinates expalantion (XxY):"
-        print ""
-        print " y"
+        print "    y"
         print "  ^     move: (1x1)       move: (2x1)      move: (2x0)"
         print "  | +-------+         +-------+        +-------+      "
         print "  | |   0   |         |     0 |        |       |      "
         print "  | | 0 0 0 |         |   0 0 |        |     0 |      "
         print "  | |   0   |         |     0 |        |   0 0 |      "
-        print "  | +-------+         +-------+        +-------+      "
+        print "  | +-------+   x     +-------+        +-------+      "
         print "  +------------>"
-        print "                x"
         quit()
 
+    # get algorithm type
+    algorithm = sys.argv[1]
+
     # extract dimension from arguments
-    x, y = [int(sys.argv[1 + i]) for i in xrange(2)]
+    x, y = [int(sys.argv[2 + i]) for i in range(2)]
 
     # check for number of steps
-    if len(sys.argv) > 3:
-        number_of_steps = int(sys.argv[3])
+    if len(sys.argv) > 4:
+        number_of_steps = int(sys.argv[4])
 
     # print init message
-    print "Solving %dx%d with initial number of steps %d" \
-            % (x, y, number_of_steps)
+    print "Solving %dx%d" % (x, y),
+
+    if algorithm == "g":
+        print "using genetic algorithm with initial number of steps %d" \
+               % number_of_steps
+    elif algorithm == "b":
+        print "using breadth-first search"
 
     # infinite loop, end program with CTRL+C
+    solution = None
     try:
-        while True:
-            # find first solution with less steps then given
-            solution = solve(x, y, number_of_steps)
-            # update number of steps
-            number_of_steps = len(solution)
-            # print solution
-            print "\nNumber of steps: %d" % number_of_steps
+        if algorithm == "g":
+            while True:
+                # find first solution with less steps then given
+                solution = solveGenetic(x, y, number_of_steps)
+                # update number of steps
+                number_of_steps = len(solution)
+                # print solution
+                print "\nNumber of steps: %d" % number_of_steps
+                print "Steps: %r" % solution
+        elif algorithm == "b":
+            solution = solveBreadth(x, y)
+            print "\nNumber of steps: %d" % len(solution)
             print "Steps: %r" % solution
     except:
+        pass
+    else:
         # if we have result draw it step by step
         if solution:
             table = createTable(x, y)
