@@ -5,9 +5,9 @@ def drawTable(table):
     print "+",
     print "-"*(len(table[0])*2),
     print "+"
-    for row in table:
+    for row in range(len(table) -1, -1, -1):
         print "|",
-        for column in row:
+        for column in table[row]:
             if column:
                 print "0",
             else:
