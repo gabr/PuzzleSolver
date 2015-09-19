@@ -1,4 +1,5 @@
 import sys
+import random
 
 def makeMove(x, y, table):
     y_len = len(table)
@@ -40,10 +41,29 @@ def solve(x, y, max_number_of_steps):
     # result list
     result = []
     while True:
+        # increment steps counter
         steps_counter += 1
 
-    # return result
-    return result
+        # random next move
+        x_rand = random.randrange(0, x)
+        y_rand = random.randrange(0, y)
+
+        # save this move
+        result.append((x_rand, y_rand))
+
+        # make this move on the table
+        makeMove(x_rand, y_rand, table)
+
+        # check table
+        if checkTable(table):
+            # done - return result
+            return result
+
+        # if it was the last step the reset
+        if steps_counter + 1 == max_number_of_steps:
+            steps_counter = 0
+            table = createTable(x, y)
+            result = []
 
 def main():
     # helper variable, store number of steps from previous solution
@@ -83,8 +103,6 @@ def main():
     # print init message
     print "Solving %dx%d with initial number of steps %d" \
             % (x, y, number_of_steps)
-
-    quit()
 
     # infinite loop, end program with CTRL+C
     while True:
