@@ -171,9 +171,10 @@ def main():
             solution = solveBreadth(x, y)
             print "\nNumber of steps: %d" % len(solution)
             print "Steps: %r" % solution
+
+            # to show the result
+            raise Exception('solution')
     except:
-        pass
-    else:
         # if we have result draw it step by step
         if solution:
             table = createTable(x, y)
